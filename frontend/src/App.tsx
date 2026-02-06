@@ -268,7 +268,7 @@ type MoleculeAnalysisResponse = {
 }
 
 // Use environment variable for API URL, fallback to localhost for development
-const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:8000'
+const API_BASE = import.meta.env.VITE_API_URL || 'https://drug-discovery-triage-1.onrender.com'
 
 // Example molecules with defined stereochemistry
 const EXAMPLE_MOLECULES = [

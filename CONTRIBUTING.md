@@ -210,7 +210,7 @@ def _predict_new_property(mol: Chem.Mol) -> Dict:
 
 Questions? Reach out:
 - GitHub Issues: [Create issue](https://github.com/mondalsou/drug-discovery-triage/issues)
-- Email: mondalsou@gmail.com
+- Email: souravchembwn@gmail.com
 
 ## 📜 License
 

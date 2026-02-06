@@ -316,8 +316,8 @@
 
 **Sourav Mondal**
 - GitHub: [@mondalsou](https://github.com/mondalsou)
-- LinkedIn: [Sourav Mondal](https://www.linkedin.com/in/sourav-mondal)
-- Email: mondalsou@gmail.com
+- LinkedIn: [Sourav Mondal](https://www.linkedin.com/in/soura1/)
+- Email: souravchembwn@gmail.com
 
 ---
 

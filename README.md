@@ -276,7 +276,7 @@ This project is licensed under the **MIT License** - see the [LICENSE](LICENSE) 
 **Sourav Mondal**
 
 - GitHub: [@mondalsou](https://github.com/mondalsou)
-- LinkedIn: [Sourav Mondal](https://www.linkedin.com/in/sourav-mondal)
+- LinkedIn: [Sourav Mondal](https://www.linkedin.com/in/soura1/)
 
 ---
 

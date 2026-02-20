@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import {
   AppBar,
   Box,
@@ -301,6 +301,42 @@ function App() {
   const [activeTab, setActiveTab] = useState(0)
   const [copied, setCopied] = useState(false)
   const [showComparison, setShowComparison] = useState(false)
+  const [elapsed, setElapsed] = useState(0)
+  const timerRef = useRef<ReturnType<typeof setInterval> | null>(null)
+
+  // Stopwatch timer for loading state
+  useEffect(() => {
+    if (loading) {
+      setElapsed(0)
+      timerRef.current = setInterval(() => {
+        setElapsed((prev) => prev + 1)
+      }, 1000)
+    } else {
+      if (timerRef.current) {
+        clearInterval(timerRef.current)
+        timerRef.current = null
+      }
+    }
+    return () => {
+      if (timerRef.current) clearInterval(timerRef.current)
+    }
+  }, [loading])
+
+  // Dynamic loading messages based on elapsed time
+  const getLoadingMessage = (seconds: number) => {
+    if (seconds < 5) return 'Sending molecule to analysis server...'
+    if (seconds < 15) return 'Server is waking up (free tier cold start)...'
+    if (seconds < 25) return 'Loading RDKit and chemistry models...'
+    if (seconds < 40) return 'Computing molecular descriptors & ADMET properties...'
+    if (seconds < 55) return 'Almost there — running toxicity predictions...'
+    return 'Still working — hang tight, first analysis takes the longest!'
+  }
+
+  const formatTime = (seconds: number) => {
+    const m = Math.floor(seconds / 60)
+    const s = seconds % 60
+    return `${m}:${s.toString().padStart(2, '0')}`
+  }
 
   const handleAnalyze = async () => {
     setLoading(true)
@@ -1713,6 +1749,120 @@ function App() {
               </Grid>
             </Paper>
           </Stack>
+        )}
+
+        {/* Loading State */}
+        {loading && (
+          <Paper
+            sx={{
+              p: 5,
+              textAlign: 'center',
+              borderRadius: 3,
+              border: '1px solid rgba(56,189,248,0.3)',
+              background: 'linear-gradient(135deg, rgba(15,23,42,0.95), rgba(15,23,42,0.9))',
+              boxShadow: '0 8px 32px rgba(56,189,248,0.15)',
+            }}
+            elevation={0}
+          >
+            {/* Animated molecule icon */}
+            <Box
+              sx={{
+                width: 80,
+                height: 80,
+                mx: 'auto',
+                mb: 3,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                borderRadius: '50%',
+                background: 'radial-gradient(circle, rgba(56,189,248,0.2) 0%, transparent 70%)',
+                animation: 'pulse 2s ease-in-out infinite',
+                '@keyframes pulse': {
+                  '0%, 100%': { transform: 'scale(1)', opacity: 0.8 },
+                  '50%': { transform: 'scale(1.1)', opacity: 1 },
+                },
+              }}
+            >
+              <Box sx={{ color: '#38bdf8', transform: 'scale(2.5)' }}>
+                <ScienceIcon />
+              </Box>
+            </Box>
+
+            {/* Stopwatch */}
+            <Typography
+              variant="h2"
+              sx={{
+                fontWeight: 700,
+                fontFamily: 'monospace',
+                color: '#38bdf8',
+                lineHeight: 1,
+                mb: 1,
+                letterSpacing: '0.05em',
+              }}
+            >
+              {formatTime(elapsed)}
+            </Typography>
+            <Typography variant="caption" sx={{ color: 'rgb(100,116,139)', display: 'block', mb: 3 }}>
+              elapsed
+            </Typography>
+
+            {/* Progress bar (indeterminate with subtle animation) */}
+            <Box sx={{ maxWidth: 400, mx: 'auto', mb: 2 }}>
+              <LinearProgress
+                variant="indeterminate"
+                sx={{
+                  height: 6,
+                  borderRadius: 3,
+                  backgroundColor: 'rgba(148,163,184,0.15)',
+                  '& .MuiLinearProgress-bar': {
+                    backgroundColor: '#38bdf8',
+                    borderRadius: 3,
+                  },
+                }}
+              />
+            </Box>
+
+            {/* Dynamic status message */}
+            <Typography
+              variant="body1"
+              sx={{
+                color: '#e5e7eb',
+                fontWeight: 500,
+                mb: 2,
+                minHeight: 28,
+                transition: 'opacity 0.3s',
+              }}
+            >
+              {getLoadingMessage(elapsed)}
+            </Typography>
+
+            {/* Cold start explanation */}
+            {elapsed >= 5 && (
+              <Box
+                sx={{
+                  mt: 2,
+                  p: 2,
+                  borderRadius: 2,
+                  backgroundColor: 'rgba(234,179,8,0.08)',
+                  border: '1px solid rgba(234,179,8,0.25)',
+                  maxWidth: 500,
+                  mx: 'auto',
+                  animation: 'fadeIn 0.5s ease-in',
+                  '@keyframes fadeIn': {
+                    from: { opacity: 0, transform: 'translateY(8px)' },
+                    to: { opacity: 1, transform: 'translateY(0)' },
+                  },
+                }}
+              >
+                <Typography variant="caption" sx={{ color: '#eab308', fontWeight: 600, display: 'block', mb: 0.5 }}>
+                  Why is this taking a while?
+                </Typography>
+                <Typography variant="caption" sx={{ color: 'rgb(148,163,184)' }}>
+                  The backend runs on Render's free tier, which sleeps after inactivity. The first request wakes the server and loads chemistry libraries (~50s). Subsequent analyses will be much faster!
+                </Typography>
+              </Box>
+            )}
+          </Paper>
         )}
 
         {/* Empty State */}
